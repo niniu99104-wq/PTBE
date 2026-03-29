@@ -231,7 +231,7 @@
     // 6. 產出代理回報文案
     function generateTextContent(agent, remitDate, amount, note) {
         let formattedAmount = Number(amount).toLocaleString();
-        let finalString = `🥜 Peanuts.bebe 匯款回報單 🥜\n\n闆娘，我已完成儲值匯款囉！\n----------------------\n● 代理編號：${agent}\n● 匯款日期：${remitDate}\n● 匯款金額：NT$ ${formattedAmount}\n● 帳號末五碼：${note}\n----------------------\n請記得將此訊息【截圖】或【複製】回傳給闆娘核對喔！✨`;
+        let finalString = `🥜 DouDou. 匯款回報單 🥜\n\n闆娘，我已完成儲值匯款囉！\n----------------------\n● 代理編號：${agent}\n● 匯款日期：${remitDate}\n● 匯款金額：NT$ ${formattedAmount}\n● 帳號末五碼：${note}\n----------------------\n請記得將此訊息【截圖】或【複製】回傳給闆娘核對喔！✨`;
         
         document.getElementById('outputText').innerText = finalString;
         document.getElementById('resultArea').style.display = 'block';

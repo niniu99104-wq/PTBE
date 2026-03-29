@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Peanuts.bebe 代理匯款回報系統</title>
+    <title>DouDou 代理匯款回報系統</title>
     <style>
         /* 整體風格：延續簡潔、溫暖、生活感 */
         body {
@@ -120,7 +120,7 @@
         <div style="font-weight:bold; color:#8d6e63;">資料同步中...</div>
     </div>
 
-    <h2>🥜 Peanuts.bebe <br>代理匯款回報系統</h2>
+    <h2>🥜 DouDou. <br>代理匯款回報系統</h2>
     
     <label>代理編號</label>
     <select id="agentSelect">
@@ -198,7 +198,7 @@
 
         if(!agent) return alert('親愛的，選個代理編號再按送出。');
         if(!amount) return alert('儲值金額總不能是空的吧，請選擇金額。');
-        if(!note) return alert('請填寫帳號末五碼，方便闆娘對帳喔！');
+        if(!note) return alert('請填寫帳號末五碼，方便小幫手對帳喔！');
 
         document.getElementById('loadingOverlay').style.display = 'flex';
 
@@ -241,7 +241,7 @@
     function copyToClipboard() {
         const textToCopy = document.getElementById('outputText').innerText;
         navigator.clipboard.writeText(textToCopy).then(() => {
-            alert('文案複製成功！快去貼給闆娘吧～');
+            alert('文案複製成功！快去貼給DouDou吧～');
         });
     }
 </script>

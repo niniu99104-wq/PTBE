@@ -1,258 +1,198 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
-<head> 
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DouDou 代理匯款回報系統</title>
+    <title>DouDou 代理回報系統</title>
     <style>
-        /* 整體風格：延續簡潔、溫暖、生活感 */
-        body {
-            font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif;
-            background: #fdfaf6;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            color: #4e342e;
-        }
-        .container {
-            background: #fff;
-            padding: 35px;
-            border-radius: 20px;
-            width: 100%;
-            max-width: 420px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-            box-sizing: border-box;
-            position: relative;
-        }
-        h2 {
-            text-align: center;
-            color: #8d6e63;
-            letter-spacing: 2px;
-            margin-bottom: 30px;
-            margin-top: 0;
-            line-height: 1.4;
-        }
-        label {
-            display: block;
-            font-size: 15px;
-            margin-bottom: 10px;
-            font-weight: bold;
-        }
-        select, input {
-            width: 100%;
-            padding: 14px;
-            margin-bottom: 20px;
-            border: 2px solid #d7ccc8;
-            border-radius: 12px;
-            font-size: 16px;
-            box-sizing: border-box;
-            outline: none;
-            color: #4e342e;
-            background: #fff;
-            cursor: pointer;
-        }
-        button.main-btn {
-            width: 100%;
-            padding: 16px;
-            background: #8d6e63;
-            color: #fff;
-            border: none;
-            border-radius: 12px;
-            font-weight: bold;
-            cursor: pointer;
-            font-size: 18px;
-            letter-spacing: 1px;
-            transition: 0.2s;
-        }
-        button.main-btn:hover {
-            background: #6d4c41;
-        }
-        #resultArea {
-            display: none;
-            margin-top: 30px;
-            padding: 20px;
-            background: #f5f0eb;
-            border-radius: 16px;
-            border-left: 6px solid #8d6e63;
-        }
-        #outputText {
-            white-space: pre-wrap;
-            font-size: 15px;
-            line-height: 1.6;
-            color: #5d4037;
-            font-weight: 500;
-        }
-        .reminder-text {
-            margin-top: 15px;
-            margin-bottom: 10px;
-            color: #d84315;
-            font-weight: bold;
-            font-size: 14px;
-            text-align: center;
-        }
-        .copy-btn {
-            width: 100%;
-            padding: 12px;
-            background: #fff;
-            border: 2px solid #d7ccc8;
-            border-radius: 10px;
-            cursor: pointer;
-            font-weight: bold;
-            color: #8d6e63;
-            font-size: 15px;
-        }
-        /* Loading 遮罩 */
-        #loadingOverlay {
-            display: none;
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(255,255,255,0.8);
-            border-radius: 20px;
-            z-index: 10;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-        }
+        body { font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif; background: #fdfaf6; margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; color: #4e342e; }
+        .container { background: #fff; padding: 30px; border-radius: 20px; width: 100%; max-width: 420px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); box-sizing: border-box; margin-bottom: 20px; position: relative; }
+        h2 { text-align: center; color: #8d6e63; letter-spacing: 2px; margin-top: 0; margin-bottom: 20px; }
+        .tab-wrapper { display: flex; background: #f5f0eb; border-radius: 12px; padding: 5px; margin-bottom: 25px; }
+        .tab-btn { flex: 1; padding: 10px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; color: #a1887f; background: none; transition: 0.3s; font-size: 14px; }
+        .tab-btn.active { background: #8d6e63; color: #fff; box-shadow: 0 4px 10px rgba(141, 110, 99, 0.3); }
+        .section-title { border-bottom: 2px solid #f5f0eb; padding-bottom: 8px; margin-bottom: 15px; font-weight: bold; color: #8d6e63; font-size: 15px; }
+        label { display: block; font-size: 14px; margin-bottom: 6px; font-weight: bold; }
+        select, input { width: 100%; padding: 12px; margin-bottom: 15px; border: 2px solid #d7ccc8; border-radius: 10px; font-size: 16px; box-sizing: border-box; outline: none; background: #fff; }
+        
+        /* 動態新增品項的專屬樣式 */
+        .item-row { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; }
+        .item-row input { margin-bottom: 0; flex: 1; }
+        .remove-btn { width: 40px; height: 40px; background: #ef9a9a; color: white; border: none; border-radius: 10px; cursor: pointer; font-size: 20px; line-height: 1; }
+        .add-btn { width: 100%; background: #d7ccc8; color: #4e342e; margin-bottom: 15px; padding: 10px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 15px; transition: 0.2s; }
+        
+        button.action-btn { width: 100%; padding: 15px; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 16px; background: #8d6e63; color: #fff; transition: 0.2s; }
+        #calcResult { text-align: center; margin-top: 10px; font-weight: bold; color: #d84315; font-size: 18px; display: none; background: #fdfaf6; padding: 12px; border-radius: 10px; border: 1px dashed #d7ccc8; margin-bottom: 15px; line-height: 1.6; }
+        #resultArea { display: none; margin-top: 20px; padding: 15px; background: #f5f0eb; border-radius: 12px; border-left: 5px solid #8d6e63; }
+        #outputText { white-space: pre-wrap; font-size: 14px; color: #5d4037; }
+        .reminder-text { margin-top: 10px; color: #d84315; font-size: 13px; text-align: center; font-weight: bold; }
+        #loadingOverlay { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.8); border-radius: 20px; z-index: 10; justify-content: center; align-items: center; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div id="loadingOverlay">
-        <div style="font-size:24px; margin-bottom:10px;">⏳</div>
-        <div style="font-weight:bold; color:#8d6e63;">資料同步中...</div>
+    <div id="loadingOverlay">⏳ 資料同步中...</div>
+    <h2>🥜 DouDou 系統</h2>
+
+    <div class="tab-wrapper">
+        <button id="tab1" class="tab-btn active" onclick="switchMode(1)">方案一：儲值回報</button>
+        <button id="tab2" class="tab-btn" onclick="switchMode(2)">方案二：單筆結帳</button>
     </div>
 
-    <h2>🥜 DouDou <br>代理匯款回報系統</h2>
-    
     <label>代理編號</label>
-    <select id="agentSelect">
-        <option value="">-- 點擊選擇編號 --</option>
-    </select>
-
+    <select id="agentSelect"><option value="">-- 點擊選擇編號 --</option></select>
     <label>匯款日期</label>
     <select id="dateSelect"></select>
 
-    <label>儲值金額 (TWD)</label>
-    <select id="amountInput">
-        <option value="">-- 請選擇匯款金額 --</option>
-    </select>
+    <div id="mode2Calc" style="display: none;">
+        <div class="section-title">📊 多品項計價小工具 (匯率 40)</div>
+        <div id="itemsContainer">
+            <label>輸入各品項原價 (KRW)</label>
+            <div class="item-row">
+                <input type="number" class="krw-item" placeholder="品項 1 韓元金額">
+            </div>
+        </div>
+        <button class="add-btn" onclick="addItemRow()">＋ 增加品項</button>
+        <button onclick="calculatePrice()" style="background:#a1887f; color:#fff; padding:12px; border-radius:10px; border:none; margin-bottom:10px; cursor:pointer; width:100%; font-weight:bold; font-size: 15px;">計算總計台幣</button>
+        <div id="calcResult"></div>
+    </div>
 
-    <label>備註 (帳號末五碼)</label>
-    <input id="noteInput" type="text" placeholder="例如：12345">
+    <div class="section-title" id="amountTitle">💰 儲值金額回報</div>
+    <div id="amountFieldArea">
+        <div id="amountInputContainer">
+            </div>
+    </div>
 
-    <button class="main-btn" onclick="processData()">填寫完畢，送出</button>
+    <label>帳號末五碼</label>
+    <input id="noteInput" type="text" placeholder="請輸入五位數字">
+
+    <button class="action-btn" onclick="processData()">填寫完畢，送出</button>
 
     <div id="resultArea">
         <div id="outputText"></div>
-        <div class="reminder-text">👇 請記得將上方訊息【截圖】或【複製】回傳給阿霓核對喔！✨</div>
-        <button class="copy-btn" onclick="copyToClipboard()">📋 點擊複製回報文案</button>
-    </div>
-    
-    <div style="margin-top:40px; font-size:13px; color:#a1887f; text-align:center; line-height:1.8; font-weight:bold;">
-        不賣焦慮，不走捷徑。<br>只選真正重要的事情做。
+        <div class="reminder-text">👇 請記得複製訊息回傳給阿霓喔！✨</div>
+        <button onclick="copyToClipboard()" style="background:#fff; border:1px solid #d7ccc8; color:#8d6e63; padding:10px; margin-top:10px; border-radius:10px; cursor:pointer; font-weight:bold; width:100%;">📋 點擊複製文案</button>
     </div>
 </div>
 
 <script>
-    // 1. 設定 Google Apps Script 通道網址
     const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwtocFv4v1vZYCEu8m1FKiYtsgmf3-3kzl1A9E1U8lzmt_jrh5kItgtpilDm8HnbOKY7g/exec';
+    let currentMode = 1;
 
-    // 2. 自動生成代理編號 (001-021)
+    // 動態新增品項行
+    function addItemRow() {
+        const container = document.getElementById('itemsContainer');
+        const row = document.createElement('div');
+        row.className = 'item-row';
+        row.innerHTML = `<input type="number" class="krw-item" placeholder="下一品項金額"><button class="remove-btn" onclick="this.parentElement.remove()">×</button>`;
+        container.appendChild(row);
+    }
+
+    // 計算總價並自動填入
+    function calculatePrice() {
+        const items = document.getElementsByClassName('krw-item');
+        let totalKrw = 0;
+        
+        for (let item of items) {
+            if (item.value) totalKrw += parseFloat(item.value);
+        }
+
+        if(totalKrw === 0) return alert('阿霓提醒：請至少輸入一個品項金額喔！');
+        
+        const twd = Math.ceil(totalKrw / 40);
+        const resultDiv = document.getElementById('calcResult');
+        resultDiv.style.display = 'block';
+        resultDiv.innerHTML = `韓元總計：${totalKrw.toLocaleString()} KRW<br><span style="font-size:14px;color:#6d4c41;">換算台幣(匯率40)：</span><br><b style="font-size:24px;">NT$ ${twd.toLocaleString()}</b>`;
+        
+        if(document.getElementById('amountVal')) {
+            document.getElementById('amountVal').value = twd;
+        }
+    }
+
+    function switchMode(mode) {
+        currentMode = mode;
+        document.getElementById('tab1').className = (mode === 1) ? 'tab-btn active' : 'tab-btn';
+        document.getElementById('tab2').className = (mode === 2) ? 'tab-btn active' : 'tab-btn';
+        document.getElementById('mode2Calc').style.display = (mode === 2) ? 'block' : 'none';
+        document.getElementById('amountTitle').innerText = (mode === 1) ? '💰 儲值金額回報' : '💰 該筆結帳台幣總額';
+        
+        const container = document.getElementById('amountInputContainer');
+        if (mode === 1) {
+            container.innerHTML = '<select id="amountVal"><option value="">-- 請選擇金額 --</option></select>';
+            for(let i=2000; i<=20000; i+=1000) {
+                let opt = document.createElement('option');
+                opt.value = i; opt.innerText = `NT$ ${i.toLocaleString()}`;
+                document.getElementById('amountVal').appendChild(opt);
+            }
+        } else {
+            container.innerHTML = '<input id="amountVal" type="number" placeholder="可手動輸入或由上方計價器自動帶入">';
+        }
+        document.getElementById('resultArea').style.display = 'none';
+    }
+
+    // 初始化下拉選單
     const agentSelect = document.getElementById('agentSelect');
     for(let i=1; i<=21; i++) {
         let num = i.toString().padStart(3, '0');
         let opt = document.createElement('option');
-        opt.value = `doudou${num}`;
-        opt.innerText = `doudou${num}`;
+        opt.value = `doudou${num}`; opt.innerText = `doudou${num}`;
         agentSelect.appendChild(opt);
     }
 
-    // 3. 自動生成最近 7 天日期
     const dateDropdown = document.getElementById('dateSelect');
     const today = new Date();
     for(let i=0; i<7; i++) {
-        let d = new Date(today);
-        d.setDate(today.getDate() - i);
-        let yyyy = d.getFullYear();
-        let mm = String(d.getMonth() + 1).padStart(2, '0');
-        let dd = String(d.getDate()).padStart(2, '0');
-        let dateString = `${yyyy}/${mm}/${dd}`;
+        let d = new Date(today); d.setDate(today.getDate() - i);
+        let dateString = `${d.getFullYear()}/${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getDate()).padStart(2, '0')}`;
         let opt = document.createElement('option');
-        opt.value = dateString;
-        opt.innerText = (i === 0) ? `${dateString} (今天)` : (i === 1) ? `${dateString} (昨天)` : dateString;
+        opt.value = dateString; opt.innerText = (i === 0) ? `${dateString} (今天)` : (i === 1) ? `${dateString} (昨天)` : dateString;
         dateDropdown.appendChild(opt);
     }
+    
+    switchMode(1); // 預設方案一
 
-    // 4. 自動生成金額選單 (2000 到 20000，間距 1000)
-    const amountSelect = document.getElementById('amountInput');
-    for(let i = 2000; i <= 20000; i += 1000) {
-        let opt = document.createElement('option');
-        opt.value = i;
-        opt.innerText = `NT$ ${i.toLocaleString()}`;
-        amountSelect.appendChild(opt);
-    }
-
-    // 5. 核心處理函數
     function processData() {
         const agent = document.getElementById('agentSelect').value;
         const remitDate = document.getElementById('dateSelect').value;
-        const amount = document.getElementById('amountInput').value;
+        const amount = document.getElementById('amountVal').value;
         const note = document.getElementById('noteInput').value;
 
-        if(!agent) return alert('親愛的，選個代理編號再按送出。');
-        if(!amount) return alert('儲值金額總不能是空的吧，請選擇金額。');
-        if(!note) return alert('請填寫帳號末五碼，方便阿霓對帳喔！');
+        if(!agent || !amount || !note) return alert('資料填寫不完整喔，阿霓會看不懂！');
 
         document.getElementById('loadingOverlay').style.display = 'flex';
-
-        const payload = {
-            date: remitDate,
-            agent: agent,
-            amount: amount,
-            note: note
+        
+        const payload = { 
+            date: remitDate, 
+            agent: agent, 
+            amount: amount, 
+            note: note,
+            type: (currentMode === 1 ? "儲值" : "單筆結帳")
         };
 
-        // 送出資料到 Google Sheet
-        fetch(GOOGLE_SCRIPT_URL, {
-            method: 'POST',
-            mode: 'no-cors',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-        })
+        fetch(GOOGLE_SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) })
         .then(() => {
             document.getElementById('loadingOverlay').style.display = 'none';
-            generateTextContent(agent, remitDate, amount, note);
-            alert('同步成功！請記得「點擊下方按鈕」複製文案，並回傳給阿霓喔！✨');
+            generateText(agent, remitDate, amount, note);
+            alert('同步成功！別忘了複製文案傳給阿霓喔。✨');
         })
-        .catch(error => {
+        .catch(() => {
             document.getElementById('loadingOverlay').style.display = 'none';
-            generateTextContent(agent, remitDate, amount, note);
-            alert('同步至試算表稍有延遲，但文案已產出，請記得複製回傳。');
+            generateText(agent, remitDate, amount, note);
         });
     }
 
-    // 6. 產出代理回報文案
-    function generateTextContent(agent, remitDate, amount, note) {
-        let formattedAmount = Number(amount).toLocaleString();
-        let finalString = `🥜 匯款回報單 🥜\n\n我已完成儲值匯款囉！\n----------------------\n● 代理編號：${agent}\n● 匯款日期：${remitDate}\n● 匯款金額：NT$ ${formattedAmount}\n● 帳號末五碼：${note}\n----------------------`;
-        
+    function generateText(agent, remitDate, amount, note) {
+        const title = (currentMode === 1) ? '儲值回報單' : '單筆結帳回報單';
+        const msg = (currentMode === 1) ? '我已完成儲值匯款囉！' : '我已完成該筆訂單結帳囉！';
+        let finalString = `🥜 DouDou ${title} 🥜\n\n阿霓，${msg}\n----------------------\n● 代理編號：${agent}\n● 匯款日期：${remitDate}\n● 匯款金額：NT$ ${Number(amount).toLocaleString()}\n● 帳號末五碼：${note}\n----------------------`;
         document.getElementById('outputText').innerText = finalString;
         document.getElementById('resultArea').style.display = 'block';
     }
 
-    // 7. 複製功能
     function copyToClipboard() {
-        const textToCopy = document.getElementById('outputText').innerText;
-        navigator.clipboard.writeText(textToCopy).then(() => {
-            alert('文案複製成功！快去貼給阿霓吧～');
-        });
+        navigator.clipboard.writeText(document.getElementById('outputText').innerText).then(() => alert('複製成功！快去私訊阿霓對帳吧～'));
     }
 </script>
-
 </body>
 </html>

@@ -13,19 +13,30 @@
         .tab-btn.active { background: #8d6e63; color: #fff; box-shadow: 0 4px 10px rgba(141, 110, 99, 0.3); }
         .section-title { border-bottom: 2px solid #f5f0eb; padding-bottom: 8px; margin-bottom: 15px; font-weight: bold; color: #8d6e63; font-size: 15px; }
         label { display: block; font-size: 14px; margin-bottom: 6px; font-weight: bold; }
-        select, input { width: 100%; padding: 12px; margin-bottom: 15px; border: 2px solid #d7ccc8; border-radius: 10px; font-size: 16px; box-sizing: border-box; outline: none; background: #fff; }
+        select, input[type="text"], input[type="number"] { width: 100%; padding: 12px; margin-bottom: 15px; border: 2px solid #d7ccc8; border-radius: 10px; font-size: 16px; box-sizing: border-box; outline: none; background: #fff; }
         
-        /* 動態新增品項的專屬樣式 */
         .item-row { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; }
         .item-row input { margin-bottom: 0; flex: 1; }
         .remove-btn { width: 40px; height: 40px; background: #ef9a9a; color: white; border: none; border-radius: 10px; cursor: pointer; font-size: 20px; line-height: 1; }
         .add-btn { width: 100%; background: #d7ccc8; color: #4e342e; margin-bottom: 15px; padding: 10px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 15px; transition: 0.2s; }
         
+        /* 帳號資訊區樣式 (移到外面了) */
+        .bank-info { background: #f5f0eb; padding: 15px; border-radius: 10px; border: 2px dashed #d7ccc8; margin-bottom: 15px; text-align: center; }
+        .bank-info span { display: block; font-size: 14px; color: #8d6e63; margin-bottom: 5px; font-weight: bold; }
+        .bank-info strong { font-size: 18px; color: #d84315; letter-spacing: 1px; }
+
+        /* 確認打勾區塊 */
+        .checkbox-group { display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 15px; background: #fdfaf6; padding: 12px; border-radius: 8px; border: 1px solid #eecaaf; }
+        .checkbox-group input { width: 18px; height: 18px; margin: 0; cursor: pointer; accent-color: #8d6e63; }
+        .checkbox-group label { font-size: 14px; font-weight: bold; color: #d84315; cursor: pointer; margin: 0; }
+
         button.action-btn { width: 100%; padding: 15px; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 16px; background: #8d6e63; color: #fff; transition: 0.2s; }
         #calcResult { text-align: center; margin-top: 10px; font-weight: bold; color: #d84315; font-size: 18px; display: none; background: #fdfaf6; padding: 12px; border-radius: 10px; border: 1px dashed #d7ccc8; margin-bottom: 15px; line-height: 1.6; }
-        #resultArea { display: none; margin-top: 20px; padding: 15px; background: #f5f0eb; border-radius: 12px; border-left: 5px solid #8d6e63; }
+        #resultArea { display: none; margin-top: 20px; padding: 20px; background: #f5f0eb; border-radius: 12px; border-left: 5px solid #8d6e63; }
+        
+        #displayTitle { font-weight: bold; color: #8d6e63; text-align: center; font-size: 16px; margin-bottom: 15px; }
         #outputText { white-space: pre-wrap; font-size: 14px; color: #5d4037; }
-        .reminder-text { margin-top: 10px; color: #d84315; font-size: 13px; text-align: center; font-weight: bold; }
+        .reminder-text { margin-top: 15px; color: #d84315; font-size: 13px; text-align: center; font-weight: bold; }
         #loadingOverlay { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.8); border-radius: 20px; z-index: 10; justify-content: center; align-items: center; }
     </style>
 </head>
@@ -59,17 +70,25 @@
     </div>
 
     <div class="section-title" id="amountTitle">💰 儲值金額回報</div>
-    <div id="amountFieldArea">
-        <div id="amountInputContainer">
-            </div>
-    </div>
+    <div id="amountInputContainer"></div>
 
     <label>帳號末五碼</label>
     <input id="noteInput" type="text" placeholder="請輸入五位數字">
 
+    <div class="bank-info">
+        <span>🏦 請匯款至以下帳號</span>
+        <strong>台新銀行 (812) <br> 28881023351575</strong>
+    </div>
+
+    <div class="checkbox-group">
+        <input type="checkbox" id="remitConfirm">
+        <label for="remitConfirm">我確認已完成上方台幣金額匯款</label>
+    </div>
+
     <button class="action-btn" onclick="processData()">填寫完畢，送出</button>
 
     <div id="resultArea">
+        <div id="displayTitle"></div>
         <div id="outputText"></div>
         <div class="reminder-text">👇 請記得複製訊息貼回代理群記事本喔！✨</div>
         <button onclick="copyToClipboard()" style="background:#fff; border:1px solid #d7ccc8; color:#8d6e63; padding:10px; margin-top:10px; border-radius:10px; cursor:pointer; font-weight:bold; width:100%;">📋 點擊複製文案</button>
@@ -80,7 +99,6 @@
     const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz-0pHVEsP9ybnZUikf8wyEvjZ7qUVLczWnvtro5i05u1jlz6J774MQT8ux30Nx9K-2Zw/exec';
     let currentMode = 1;
 
-    // 動態新增品項行
     function addItemRow() {
         const container = document.getElementById('itemsContainer');
         const row = document.createElement('div');
@@ -89,25 +107,16 @@
         container.appendChild(row);
     }
 
-    // 計算總價並自動填入
     function calculatePrice() {
         const items = document.getElementsByClassName('krw-item');
         let totalKrw = 0;
-        
-        for (let item of items) {
-            if (item.value) totalKrw += parseFloat(item.value);
-        }
-
+        for (let item of items) { if (item.value) totalKrw += parseFloat(item.value); }
         if(totalKrw === 0) return alert('Dou提醒：請至少輸入一個品項金額喔！');
-        
         const twd = Math.ceil(totalKrw / 40);
         const resultDiv = document.getElementById('calcResult');
         resultDiv.style.display = 'block';
         resultDiv.innerHTML = `韓元總計：${totalKrw.toLocaleString()} KRW<br><span style="font-size:14px;color:#6d4c41;">換算台幣(匯率40)：</span><br><b style="font-size:24px;">NT$ ${twd.toLocaleString()}</b>`;
-        
-        if(document.getElementById('amountVal')) {
-            document.getElementById('amountVal').value = twd;
-        }
+        if(document.getElementById('amountVal')) { document.getElementById('amountVal').value = twd; }
     }
 
     function switchMode(mode) {
@@ -116,7 +125,6 @@
         document.getElementById('tab2').className = (mode === 2) ? 'tab-btn active' : 'tab-btn';
         document.getElementById('mode2Calc').style.display = (mode === 2) ? 'block' : 'none';
         document.getElementById('amountTitle').innerText = (mode === 1) ? '💰 儲值金額回報 (匯率 41)' : '💰 該筆結帳台幣總額';
-        
         const container = document.getElementById('amountInputContainer');
         if (mode === 1) {
             container.innerHTML = '<select id="amountVal"><option value="">-- 請選擇金額 --</option></select>';
@@ -131,7 +139,6 @@
         document.getElementById('resultArea').style.display = 'none';
     }
 
-    // 初始化下拉選單
     const agentSelect = document.getElementById('agentSelect');
     for(let i=0; i<=30; i++) {
         let num = i.toString().padStart(3, '0');
@@ -149,43 +156,37 @@
         opt.value = dateString; opt.innerText = (i === 0) ? `${dateString} (今天)` : (i === 1) ? `${dateString} (昨天)` : dateString;
         dateDropdown.appendChild(opt);
     }
-    
-    switchMode(1); // 預設方案一
+    switchMode(1);
 
     function processData() {
+        const isConfirmed = document.getElementById('remitConfirm').checked;
+        if(!isConfirmed) {
+            return alert('Dou溫馨提醒：送出前請務必確認已完成匯款，並勾選確認框喔！');
+        }
+
         const agent = document.getElementById('agentSelect').value;
         const remitDate = document.getElementById('dateSelect').value;
         const amount = document.getElementById('amountVal').value;
         const note = document.getElementById('noteInput').value;
-
-        if(!agent || !amount || !note) return alert('資料填寫不完整喔，Dou會看不懂！');
-
-        document.getElementById('loadingOverlay').style.display = 'flex';
+        if(!agent || !amount || !note) return alert('資料不完整喔，Dou會看不懂！');
         
-        const payload = { 
-            date: remitDate, 
-            agent: agent, 
-            amount: amount, 
-            note: note,
-            type: (currentMode === 1 ? "儲值" : "單筆結帳")
-        };
-
+        document.getElementById('loadingOverlay').style.display = 'flex';
+        const payload = { date: remitDate, agent: agent, amount: amount, note: note, type: (currentMode === 1 ? "儲值" : "單筆結帳") };
+        
         fetch(GOOGLE_SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) })
         .then(() => {
             document.getElementById('loadingOverlay').style.display = 'none';
             generateText(agent, remitDate, amount, note);
             alert('同步成功！別忘了複製貼回記事本喔。✨');
         })
-        .catch(() => {
-            document.getElementById('loadingOverlay').style.display = 'none';
-            generateText(agent, remitDate, amount, note);
-        });
+        .catch(() => { document.getElementById('loadingOverlay').style.display = 'none'; generateText(agent, remitDate, amount, note); });
     }
 
     function generateText(agent, remitDate, amount, note) {
-        const title = (currentMode === 1) ? '儲值回報單' : '單筆結帳回報單';
+        const title = (currentMode === 1) ? '🥜 DouDou 儲值回報單 🥜' : '🥜 DouDou 單筆結帳回報單 🥜';
+        document.getElementById('displayTitle').innerText = title;
         const msg = (currentMode === 1) ? '我已完成儲值匯款囉！' : '我已完成該筆訂單結帳囉！';
-        let finalString = `🥜 DouDou ${title} 🥜\n\n${msg}\n----------------------\n● 代理編號：${agent}\n● 匯款日期：${remitDate}\n● 匯款金額：NT$ ${Number(amount).toLocaleString()}\n● 帳號末五碼：${note}\n----------------------`;
+        let finalString = `${msg}\n----------------------\n● 代理編號：${agent}\n● 匯款日期：${remitDate}\n● 匯款金額：NT$ ${Number(amount).toLocaleString()}\n● 帳號末五碼：${note}\n----------------------`;
         document.getElementById('outputText').innerText = finalString;
         document.getElementById('resultArea').style.display = 'block';
     }

@@ -71,7 +71,7 @@
 
     <div id="resultArea">
         <div id="outputText"></div>
-        <div class="reminder-text">👇 請記得複製訊息回傳給阿霓喔！✨</div>
+        <div class="reminder-text">👇 請記得複製訊息貼回代理群記事本喔！✨</div>
         <button onclick="copyToClipboard()" style="background:#fff; border:1px solid #d7ccc8; color:#8d6e63; padding:10px; margin-top:10px; border-radius:10px; cursor:pointer; font-weight:bold; width:100%;">📋 點擊複製文案</button>
     </div>
 </div>
@@ -98,7 +98,7 @@
             if (item.value) totalKrw += parseFloat(item.value);
         }
 
-        if(totalKrw === 0) return alert('阿霓提醒：請至少輸入一個品項金額喔！');
+        if(totalKrw === 0) return alert('Dou提醒：請至少輸入一個品項金額喔！');
         
         const twd = Math.ceil(totalKrw / 40);
         const resultDiv = document.getElementById('calcResult');
@@ -111,6 +111,7 @@
     }
 
     function switchMode(mode) {
+oD
         currentMode = mode;
         document.getElementById('tab1').className = (mode === 1) ? 'tab-btn active' : 'tab-btn';
         document.getElementById('tab2').className = (mode === 2) ? 'tab-btn active' : 'tab-btn';
@@ -158,7 +159,7 @@
         const amount = document.getElementById('amountVal').value;
         const note = document.getElementById('noteInput').value;
 
-        if(!agent || !amount || !note) return alert('資料填寫不完整喔，阿霓會看不懂！');
+        if(!agent || !amount || !note) return alert('資料填寫不完整喔，Dou會看不懂！');
 
         document.getElementById('loadingOverlay').style.display = 'flex';
         
@@ -174,7 +175,7 @@
         .then(() => {
             document.getElementById('loadingOverlay').style.display = 'none';
             generateText(agent, remitDate, amount, note);
-            alert('同步成功！別忘了複製文案傳給阿霓喔。✨');
+            alert('同步成功！別忘了複製貼回記事本喔。✨');
         })
         .catch(() => {
             document.getElementById('loadingOverlay').style.display = 'none';
@@ -185,13 +186,13 @@
     function generateText(agent, remitDate, amount, note) {
         const title = (currentMode === 1) ? '儲值回報單' : '單筆結帳回報單';
         const msg = (currentMode === 1) ? '我已完成儲值匯款囉！' : '我已完成該筆訂單結帳囉！';
-        let finalString = `🥜 DouDou ${title} 🥜\n\n阿霓，${msg}\n----------------------\n● 代理編號：${agent}\n● 匯款日期：${remitDate}\n● 匯款金額：NT$ ${Number(amount).toLocaleString()}\n● 帳號末五碼：${note}\n----------------------`;
+        let finalString = `🥜 DouDou ${title} 🥜\n\n${msg}\n----------------------\n● 代理編號：${agent}\n● 匯款日期：${remitDate}\n● 匯款金額：NT$ ${Number(amount).toLocaleString()}\n● 帳號末五碼：${note}\n----------------------`;
         document.getElementById('outputText').innerText = finalString;
         document.getElementById('resultArea').style.display = 'block';
     }
 
     function copyToClipboard() {
-        navigator.clipboard.writeText(document.getElementById('outputText').innerText).then(() => alert('複製成功！快去私訊阿霓對帳吧～'));
+        navigator.clipboard.writeText(document.getElementById('outputText').innerText).then(() => alert('複製成功！快去貼記事本對帳吧～'));
     }
 </script>
 </body>

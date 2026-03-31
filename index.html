@@ -36,8 +36,8 @@
     <h2>🥜 DouDou 系統</h2>
 
     <div class="tab-wrapper">
-        <button id="tab1" class="tab-btn active" onclick="switchMode(1)">方案一：儲值回報</button>
-        <button id="tab2" class="tab-btn" onclick="switchMode(2)">方案二：單筆結帳</button>
+        <button id="tab1" class="tab-btn active" onclick="switchMode(1)">儲值回報</button>
+        <button id="tab2" class="tab-btn" onclick="switchMode(2)">單筆結帳</button>
     </div>
 
     <label>代理編號</label>
@@ -115,7 +115,7 @@
         document.getElementById('tab1').className = (mode === 1) ? 'tab-btn active' : 'tab-btn';
         document.getElementById('tab2').className = (mode === 2) ? 'tab-btn active' : 'tab-btn';
         document.getElementById('mode2Calc').style.display = (mode === 2) ? 'block' : 'none';
-        document.getElementById('amountTitle').innerText = (mode === 1) ? '💰 儲值金額回報' : '💰 該筆結帳台幣總額';
+        document.getElementById('amountTitle').innerText = (mode === 1) ? '💰 儲值金額回報 (匯率 41)' : '💰 該筆結帳台幣總額';
         
         const container = document.getElementById('amountInputContainer');
         if (mode === 1) {
